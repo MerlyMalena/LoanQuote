@@ -9,10 +9,142 @@ function selectCurrency() {
 }
 
 
-// Condiciones financieras
-$("#requestedAmount, #downPayment").on('input',()=>{
-  const requestedAmount = parseFloat(document.getElementById("requestedAmount").value) || 0;
-  const downPayment = parseFloat(document.querySelector("#downPayment").value) || 0;
+// Obtiene el mapa de pagos extraordinarios
+function getExtraPaymentsMap() {
+  const extraPayments = {};
+  const termMonths = parseInt($("#termMonths").val()) || 360;
+  $("input[name='extraPaymentMonth']").each(function(index) {
+     const month = parseInt(this.value);
+     const amount = parseFloat($("input[name='extraPaymentAmount']").eq(index).val()) || 0;
+     if (month >= 1 && month <= termMonths && amount > 0) {
+        extraPayments[month] = (extraPayments[month] || 0) + amount;
+     }
+  });
+  return extraPayments;
+}
+
+// Recalcula automáticamente la tabla de amortización y el resumen en tiempo real
+function recalcularTodoEnTiempoReal() {
+  const requestedAmount = parseFloat($("#requestedAmount").val()) || 0;
+  const downPayment = parseFloat($("#downPayment").val()) || 0;
+  const adminFee = parseFloat($("#adminFee").val()) || 0;
+  const anualRate = parseFloat($("#annualInterestRate").val()) || 0;
+  const termMonths = parseInt($("#termMonths").val()) || 0;
+  const monthsDeadline = Math.min(Math.max(termMonths, 1), 360);
+  const applyInsurance = $("#applyInsurance").is(':checked');
+  const monthlyInsurancePerc = applyInsurance ? (parseFloat($("#insurancePercentage").val()) || 0) : 0;
+  const selectedOption = $("#adminFeeType").val();
+  const baseAmount = calculateFinalFinancedAmount(selectedOption);
+  const extraPayments = getExtraPaymentsMap();
+  const currency = selectCurrency();
+  const amortizationType = $("#amortizationType").val();
+  const firstPaymentDate = $("#firstPaymentDate").val();
+  const monthlyIncome = parseFloat($("#monthlyIncome").val()) || 0;
+
+  // Actualiza el campo calculado del monto financiado
+  $("#financedAmountDisplay").val(calculateFinancedAmount().toFixed(2));
+
+  // Si los datos mínimos para amortizar no son válidos, limpia tabla
+  if (requestedAmount <= 0 || downPayment >= requestedAmount || termMonths <= 0) {
+     return null;
+  }
+
+  // Genera la tabla de pagos
+  const payments = calculateAmortization(
+     baseAmount,
+     anualRate,
+     monthsDeadline,
+     monthlyInsurancePerc,
+     amortizationType,
+     extraPayments,
+     firstPaymentDate
+  );
+
+  if (payments.length > 0) {
+     // Renderiza la tabla de amortización en tiempo real
+     $("#amortizationContainer").html(payments.map(p => `<tr>
+        <td>${p.month}</td>
+        <td>${p.date}</td>
+        <td>${formatCurrency(p.initialBalance, currency)}</td>
+        <td>${formatCurrency(p.installment, currency)}</td>
+        <td>${formatCurrency(p.capital, currency)}</td>
+        <td>${formatCurrency(p.interest, currency)}</td>
+        <td>${formatCurrency(p.insurance, currency)}</td>
+        <td>${formatCurrency(p.extraPayment, currency)}</td>
+        <td>${formatCurrency(p.totalPayment, currency)}</td>
+        <td>${formatCurrency(p.finalBalance, currency)}</td>
+     </tr>`).join(''));
+
+     // Totales acumulados
+     const cuotasGeneradas = payments.length;
+     const totalCapital = payments.reduce((sum, p) => sum + p.capital, 0);
+     const totalIntereses = payments.reduce((sum, p) => sum + p.interest, 0);
+     const totalSeguro = payments.reduce((sum, p) => sum + p.insurance, 0);
+     const totalPagosExtra = payments.reduce((sum, p) => sum + p.extraPayment, 0);
+     const totalCuotasPagadas = payments.reduce((sum, p) => sum + p.totalPayment, 0);
+     const cuotaInicialTotal = payments[0].totalPayment;
+
+     const comisionInicial = selectedOption === "Cobrar como cargo inicial" ? adminFee : 0;
+     const totalGeneral = totalCuotasPagadas + comisionInicial;
+     const fechaFin = payments[payments.length - 1].date || "-";
+
+     // Nivel de endeudamiento
+     let relacionCuotaIngreso = 0;
+     let nivelEndeudamiento = "-";
+     let badgeClass = "bg-secondary";
+
+     if (monthlyIncome > 0 && cuotaInicialTotal > 0) {
+        relacionCuotaIngreso = (cuotaInicialTotal / monthlyIncome) * 100;
+        if (relacionCuotaIngreso <= 30) {
+           nivelEndeudamiento = "Nivel saludable";
+           badgeClass = "bg-success";
+        } else if (relacionCuotaIngreso <= 50) {
+           nivelEndeudamiento = "Nivel de riesgo medio";
+           badgeClass = "bg-warning text-dark";
+        } else {
+           nivelEndeudamiento = "Nivel de riesgo alto";
+           badgeClass = "bg-danger";
+        }
+     }
+
+     // Actualiza los valores en el resumen de cálculos
+     $("#resMontoSolicitado").text(formatCurrency(requestedAmount, currency));
+     $("#resPagoInicial").text(formatCurrency(downPayment, currency));
+     $("#resComision").text(formatCurrency(adminFee, currency));
+     $("#resMontoFinanciado").text(formatCurrency(calculateFinancedAmount(), currency));
+     $("#resMontoBase").text(formatCurrency(baseAmount, currency));
+     $("#resTasaAnual").text(anualRate.toFixed(2) + "%");
+     $("#resTasaMensual").text((calculateMonthlyRate(anualRate) * 100).toFixed(2) + "%");
+     $("#resPlazoMeses").text(monthsDeadline);
+     $("#resCuotasGeneradas").text(cuotasGeneradas);
+     $("#resCuotaInicial").text(formatCurrency(cuotaInicialTotal, currency));
+     $("#resTotalCapital").text(formatCurrency(totalCapital, currency));
+     $("#resTotalIntereses").text(formatCurrency(totalIntereses, currency));
+     $("#resTotalSeguro").text(formatCurrency(totalSeguro, currency));
+     $("#resTotalPagosExtra").text(formatCurrency(totalPagosExtra, currency));
+     $("#resTotalCuotas").text(formatCurrency(totalCuotasPagadas, currency));
+     $("#resTotalGeneral").text(formatCurrency(totalGeneral, currency));
+     $("#resFechaFin").text(fechaFin);
+     $("#resRelacionCuotaIngreso").text(relacionCuotaIngreso.toFixed(2) + "%");
+     $("#resNivelEndeudamiento").text(nivelEndeudamiento).removeClass("bg-secondary bg-success bg-warning bg-danger text-dark").addClass(badgeClass);
+
+     return {
+        requestedAmount, downPayment, adminFee, anualRate, monthsDeadline,
+        monthlyInsurancePerc, selectedOption, baseAmount, extraPayments,
+        currency, amortizationType, firstPaymentDate, monthlyIncome,
+        payments, cuotasGeneradas, totalCapital, totalIntereses, totalSeguro,
+        totalPagosExtra, totalCuotasPagadas, cuotaInicialTotal, totalGeneral,
+        fechaFin, nivelEndeudamiento
+     };
+  }
+
+  return null;
+}
+
+// Escucha cambios en todos los campos que afectan los cálculos para actualizar en tiempo real
+$("#requestedAmount, #downPayment, #annualInterestRate, #termMonths, #firstPaymentDate, #amortizationType, #applyInsurance, #insurancePercentage, #adminFee, #adminFeeType, #currency, #monthlyIncome").on('input change', function() {
+  const requestedAmount = parseFloat($("#requestedAmount").val()) || 0;
+  const downPayment = parseFloat($("#downPayment").val()) || 0;
 
   if (downPayment >= requestedAmount && requestedAmount > 0) {
     setFieldError('#downPayment', 'El pago inicial debe ser menor que el monto solicitado.');
@@ -20,155 +152,48 @@ $("#requestedAmount, #downPayment").on('input',()=>{
     clearFieldError('#downPayment');
   }
 
-  // Le da al input el nuevo valor
-  $('#financedAmountDisplay').val(calculateFinancedAmount().toFixed(2));
+  recalcularTodoEnTiempoReal();
 });
 
-
-// Si el usuario marca Aplicar seguro, el campo Porcentaje de seguro mensual debe habilitarse y convertirse en requerido.
-$("#applyInsurance").on('change', function(){
-   const isChecked=$(this).is(':checked');
-
-   if (!isChecked){
-    $("#insurancePercentage").prop('disabled',true);
-    $("#insurancePercentage").prop('required',false);
-   }
-   else {
-    $("#insurancePercentage").prop('disabled',false);
-    $("#insurancePercentage").prop('required',true);
-   }
-  
+// Manejo del checkbox de seguro mensual
+$("#applyInsurance").on('change', function() {
+  const isChecked = $(this).is(':checked');
+  if (!isChecked) {
+    $("#insurancePercentage").val('').prop('disabled', true).prop('required', false);
+  } else {
+    $("#insurancePercentage").prop('disabled', false).prop('required', true);
+  }
+  recalcularTodoEnTiempoReal();
 });
 
-// Reglas de comisión administrativa
-
-function actualizarMonto() {
-  let selectedOption = $("#adminFeeType").val();
-  const financedAmount = calculateFinalFinancedAmount(selectedOption);
-  $("#resMontoFinanciado").text(formatCurrency(financedAmount, selectCurrency()));
-}
-
-$("#btnAddExtraPayment").on('click', function(){
-   const row=$('<tr><td><input type="number" class="form-control" name="extraPaymentMonth" min="1" step="1"></td><td><input type="number" class="form-control" name="extraPaymentAmount" min="0" step="0.01"></td><td><input type="text" class="form-control" name="extraPaymentDescription"></td><td class="text-center"><button type="button" class="btn btn-danger btn-sm">Eliminar</button></td></tr>');
-   row.find("button").on('click', function(){
+// Agregar pago extraordinario dinámicamente
+$("#btnAddExtraPayment").on('click', function() {
+   const row = $('<tr><td><input type="number" class="form-control" name="extraPaymentMonth" min="1" step="1"></td><td><input type="number" class="form-control" name="extraPaymentAmount" min="0" step="0.01"></td><td><input type="text" class="form-control" name="extraPaymentDescription"></td><td class="text-center"><button type="button" class="btn btn-danger btn-sm">Eliminar</button></td></tr>');
+   row.find("button").on('click', function() {
       row.remove();
-      $("#noExtraPaymentsMsg").toggle($("#extraPaymentsContainer tr").length===0);
+      $("#noExtraPaymentsMsg").toggle($("#extraPaymentsContainer tr").length === 0);
+      recalcularTodoEnTiempoReal();
    });
    $("#extraPaymentsContainer").append(row);
    $("#noExtraPaymentsMsg").hide();
 });
 
-// Generar resumen de cotización
-$("#btnGenerateQuote").on('click', function(){
+// Detectar cambios dentro de la tabla de pagos extraordinarios
+$("#extraPaymentsContainer").on('input change', 'input', function() {
+  recalcularTodoEnTiempoReal();
+});
+
+// Generar cotización al presionar el botón
+$("#btnGenerateQuote").on('click', function() {
    // Valida todos los campos antes de continuar
    if (!validateAll()) {
       return;
    }
 
-   const requestedAmount=parseFloat(document.querySelector("#requestedAmount").value)||0;
-   const downPayment=parseFloat(document.querySelector("#downPayment").value)||0;
-   const adminFee=parseFloat(document.querySelector("#adminFee").value)||0;
-   const anualRate=parseFloat(document.querySelector("#annualInterestRate").value)||0;
-   const requestedMonths=parseInt(document.querySelector("#termMonths").value)||12;
-   const monthsDeadline=Math.min(Math.max(requestedMonths,1),360);
-   const monthlyInsurancePerc=$("#applyInsurance").is(':checked')?parseFloat(document.querySelector("#insurancePercentage").value)||0:0;
-   const selectedOption=$("#adminFeeType").val();
-   const baseAmount=calculateFinalFinancedAmount(selectedOption);
-   const extraPayments={};
-
-   $("input[name='extraPaymentMonth']").each(function(index){
-      const month=parseInt(this.value);
-      const amount=parseFloat(document.querySelectorAll("input[name='extraPaymentAmount']")[index].value)||0;
-      if (month>=1&&month<=monthsDeadline&&amount>0){
-         extraPayments[month]=(extraPayments[month]||0)+amount;
-      }
-   });
-
-   const currency = selectCurrency();
-   const amortizationType = document.querySelector("#amortizationType").value;
-   const firstPaymentDate = document.querySelector("#firstPaymentDate").value;
-   const monthlyIncome = parseFloat(document.querySelector("#monthlyIncome").value) || 0;
-
-   // Calcula la tabla de amortización
-   const payments = calculateAmortization(
-      baseAmount,
-      anualRate,
-      monthsDeadline,
-      monthlyInsurancePerc,
-      amortizationType,
-      extraPayments,
-      firstPaymentDate
-   );
-
-   // Renderiza la tabla de amortización
-   $("#amortizationContainer").html(payments.map(payment => `<tr>
-      <td>${payment.month}</td>
-      <td>${payment.date}</td>
-      <td>${formatCurrency(payment.initialBalance, currency)}</td>
-      <td>${formatCurrency(payment.installment, currency)}</td>
-      <td>${formatCurrency(payment.capital, currency)}</td>
-      <td>${formatCurrency(payment.interest, currency)}</td>
-      <td>${formatCurrency(payment.insurance, currency)}</td>
-      <td>${formatCurrency(payment.extraPayment, currency)}</td>
-      <td>${formatCurrency(payment.totalPayment, currency)}</td>
-      <td>${formatCurrency(payment.finalBalance, currency)}</td>
-   </tr>`).join(''));
-
-   // Totales acumulados para el resumen
-   const cuotasGeneradas = payments.length;
-   const totalCapital = payments.reduce((sum, p) => sum + p.capital, 0);
-   const totalIntereses = payments.reduce((sum, p) => sum + p.interest, 0);
-   const totalSeguro = payments.reduce((sum, p) => sum + p.insurance, 0);
-   const totalPagosExtra = payments.reduce((sum, p) => sum + p.extraPayment, 0);
-   const totalCuotasPagadas = payments.reduce((sum, p) => sum + (p.installment + p.insurance), 0);
-   const cuotaInicialTotal = payments.length > 0 ? (payments[0].installment + payments[0].insurance) : 0;
-
-   // Si la comisión se cobró como cargo inicial, se suma al total general a pagar
-   const comisionInicial = selectedOption === "Cobrar como cargo inicial" ? adminFee : 0;
-   const totalGeneral = totalCuotasPagadas + comisionInicial;
-
-   // Fecha de la última cuota generada
-   const fechaFin = payments.length > 0 ? payments[payments.length - 1].date : "-";
-
-   // Relación cuota / ingreso y nivel de endeudamiento
-   let relacionCuotaIngreso = 0;
-   let nivelEndeudamiento = "-";
-   let badgeClass = "bg-secondary";
-
-   if (monthlyIncome > 0 && cuotaInicialTotal > 0) {
-      relacionCuotaIngreso = (cuotaInicialTotal / monthlyIncome) * 100;
-      if (relacionCuotaIngreso <= 30) {
-         nivelEndeudamiento = "Nivel saludable";
-         badgeClass = "bg-success";
-      } else if (relacionCuotaIngreso <= 50) {
-         nivelEndeudamiento = "Nivel de riesgo medio";
-         badgeClass = "bg-warning text-dark";
-      } else {
-         nivelEndeudamiento = "Nivel de riesgo alto";
-         badgeClass = "bg-danger";
-      }
+   const calc = recalcularTodoEnTiempoReal();
+   if (!calc || !calc.payments || calc.payments.length === 0) {
+      return;
    }
-
-   // Actualiza todos los campos del resumen de cálculos
-   $("#resMontoSolicitado").text(formatCurrency(requestedAmount, currency));
-   $("#resPagoInicial").text(formatCurrency(downPayment, currency));
-   $("#resComision").text(formatCurrency(adminFee, currency));
-   $("#resMontoBase").text(formatCurrency(baseAmount, currency));
-   $("#resTasaAnual").text(anualRate.toFixed(2) + "%");
-   $("#resTasaMensual").text((calculateMonthlyRate(anualRate) * 100).toFixed(2) + "%");
-   $("#resPlazoMeses").text(monthsDeadline);
-   $("#resCuotasGeneradas").text(cuotasGeneradas);
-   $("#resCuotaInicial").text(formatCurrency(cuotaInicialTotal, currency));
-   $("#resTotalCapital").text(formatCurrency(totalCapital, currency));
-   $("#resTotalIntereses").text(formatCurrency(totalIntereses, currency));
-   $("#resTotalSeguro").text(formatCurrency(totalSeguro, currency));
-   $("#resTotalPagosExtra").text(formatCurrency(totalPagosExtra, currency));
-   $("#resTotalCuotas").text(formatCurrency(totalCuotasPagadas, currency));
-   $("#resTotalGeneral").text(formatCurrency(totalGeneral, currency));
-   $("#resFechaFin").text(fechaFin);
-   $("#resRelacionCuotaIngreso").text(relacionCuotaIngreso.toFixed(2) + "%");
-   $("#resNivelEndeudamiento").text(nivelEndeudamiento).removeClass("bg-secondary bg-success bg-warning bg-danger text-dark").addClass(badgeClass);
-   actualizarMonto();
 
    // Genera la vista visual de la cotización generada
    renderGeneratedQuote({
@@ -186,7 +211,7 @@ $("#btnGenerateQuote").on('click', function(){
          phone: $("#applicantPhone").val().trim(),
          email: $("#applicantEmail").val().trim(),
          address: $("#applicantAddress").val().trim(),
-         income: monthlyIncome
+         income: calc.monthlyIncome
       },
       quote: {
          number: $("#quoteNumber").val().trim(),
@@ -194,37 +219,37 @@ $("#btnGenerateQuote").on('click', function(){
          date: $("#quoteDate").val(),
          expiryDate: $("#expiryDate").val(),
          status: $("#status").val(),
-         currency: currency
+         currency: calc.currency
       },
       conditions: {
-         requestedAmount: requestedAmount,
-         downPayment: downPayment,
+         requestedAmount: calc.requestedAmount,
+         downPayment: calc.downPayment,
          financedAmount: calculateFinancedAmount(),
-         baseAmount: baseAmount,
-         anualRate: anualRate,
-         monthlyRate: calculateMonthlyRate(anualRate) * 100,
-         termMonths: monthsDeadline,
-         firstPaymentDate: firstPaymentDate,
-         amortizationType: amortizationType
+         baseAmount: calc.baseAmount,
+         anualRate: calc.anualRate,
+         monthlyRate: calculateMonthlyRate(calc.anualRate) * 100,
+         termMonths: calc.monthsDeadline,
+         firstPaymentDate: calc.firstPaymentDate,
+         amortizationType: calc.amortizationType
       },
       charges: {
          applyInsurance: $("#applyInsurance").is(':checked'),
-         insurancePercentage: monthlyInsurancePerc,
-         adminFee: adminFee,
-         adminFeeType: selectedOption
+         insurancePercentage: calc.monthlyInsurancePerc,
+         adminFee: calc.adminFee,
+         adminFeeType: calc.selectedOption
       },
       summary: {
-         cuotaInicial: cuotaInicialTotal,
-         totalCapital: totalCapital,
-         totalIntereses: totalIntereses,
-         totalSeguro: totalSeguro,
-         totalPagosExtra: totalPagosExtra,
-         totalGeneral: totalGeneral,
-         fechaFin: fechaFin,
-         nivelEndeudamiento: nivelEndeudamiento
+         cuotaInicial: calc.cuotaInicialTotal,
+         totalCapital: calc.totalCapital,
+         totalIntereses: calc.totalIntereses,
+         totalSeguro: calc.totalSeguro,
+         totalPagosExtra: calc.totalPagosExtra,
+         totalGeneral: calc.totalGeneral,
+         fechaFin: calc.fechaFin,
+         nivelEndeudamiento: calc.nivelEndeudamiento
       },
-      payments: payments,
-      currency: currency
+      payments: calc.payments,
+      currency: calc.currency
    });
 
    // Reinicia el formulario dejando la cotización visible
