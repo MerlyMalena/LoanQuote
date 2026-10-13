@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LoanQuote - Cotizador de Préstamos</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-success-subtle">
 
@@ -16,7 +17,7 @@
 
     <form id="loanForm" novalidate>
       <!-- 1. Datos de la entidad financiera -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionEntity">
         <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">1. Datos de la entidad financiera</h2>
         </div>
@@ -24,32 +25,32 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label for="entityName" class="form-label">Nombre de la entidad *</label>
-              <input type="text" class="form-control" id="entityName" name="entityName" required>
+              <input type="text" class="form-control" id="entityName" name="entityName" placeholder="Ej. Banco Progreso" required>
               <div class="invalid-feedback">Debe ingresar el nombre de la entidad financiera.</div>
             </div>
             <div class="col-md-6">
               <label for="entityRnc" class="form-label">RNC o identificación *</label>
-              <input type="text" class="form-control" id="entityRnc" name="entityRnc" required>
+              <input type="text" class="form-control" id="entityRnc" name="entityRnc" placeholder="Ej. 1-01-00000-0" required>
               <div class="invalid-feedback">Debe ingresar el RNC o identificación.</div>
             </div>
             <div class="col-md-4">
               <label for="entityPhone" class="form-label">Teléfono *</label>
-              <input type="text" class="form-control" id="entityPhone" name="entityPhone" required>
+              <input type="text" class="form-control" id="entityPhone" name="entityPhone" placeholder="Ej. 809-555-0100" required>
               <div class="invalid-feedback">Debe ingresar el teléfono de la entidad.</div>
             </div>
             <div class="col-md-4">
               <label for="entityEmail" class="form-label">Correo electrónico *</label>
-              <input type="email" class="form-control" id="entityEmail" name="entityEmail" required>
+              <input type="email" class="form-control" id="entityEmail" name="entityEmail" placeholder="contacto@entidad.com" required>
               <div class="invalid-feedback">Debe ingresar un correo electrónico válido.</div>
             </div>
             <div class="col-md-4">
               <label for="entityLogo" class="form-label">URL del logo</label>
-              <input type="url" class="form-control" id="entityLogo" name="entityLogo">
+              <input type="url" class="form-control" id="entityLogo" name="entityLogo" placeholder="https://ejemplo.com/logo.png">
               <div class="invalid-feedback">Debe ingresar una URL de logo válida.</div>
             </div>
             <div class="col-12">
               <label for="entityAddress" class="form-label">Dirección *</label>
-              <input type="text" class="form-control" id="entityAddress" name="entityAddress" required>
+              <input type="text" class="form-control" id="entityAddress" name="entityAddress" placeholder="Av. Winston Churchill #100, Santo Domingo" required>
               <div class="invalid-feedback">Debe ingresar la dirección de la entidad.</div>
             </div>
           </div>
@@ -57,7 +58,7 @@
       </section>
 
       <!-- 2. Datos del solicitante -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionApplicant">
         <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">2. Datos del solicitante</h2>
         </div>
@@ -65,32 +66,32 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label for="applicantName" class="form-label">Nombre del solicitante *</label>
-              <input type="text" class="form-control" id="applicantName" name="applicantName" required>
+              <input type="text" class="form-control" id="applicantName" name="applicantName" placeholder="Ej. Juan Pérez" required>
               <div class="invalid-feedback">Debe ingresar el nombre del solicitante.</div>
             </div>
             <div class="col-md-6">
               <label for="applicantId" class="form-label">Identificación *</label>
-              <input type="text" class="form-control" id="applicantId" name="applicantId" required>
+              <input type="text" class="form-control" id="applicantId" name="applicantId" placeholder="Ej. 402-0000000-0" required>
               <div class="invalid-feedback">Debe ingresar la identificación del solicitante.</div>
             </div>
             <div class="col-md-4">
               <label for="applicantPhone" class="form-label">Teléfono *</label>
-              <input type="text" class="form-control" id="applicantPhone" name="applicantPhone" required>
+              <input type="text" class="form-control" id="applicantPhone" name="applicantPhone" placeholder="Ej. 809-555-0199" required>
               <div class="invalid-feedback">Debe ingresar el teléfono del solicitante.</div>
             </div>
             <div class="col-md-4">
               <label for="applicantEmail" class="form-label">Correo electrónico *</label>
-              <input type="email" class="form-control" id="applicantEmail" name="applicantEmail" required>
+              <input type="email" class="form-control" id="applicantEmail" name="applicantEmail" placeholder="juan.perez@email.com" required>
               <div class="invalid-feedback">Debe ingresar un correo electrónico válido.</div>
             </div>
             <div class="col-md-4">
               <label for="monthlyIncome" class="form-label">Ingreso mensual *</label>
-              <input type="number" class="form-control" id="monthlyIncome" name="monthlyIncome" step="0.01" min="0.01" required>
+              <input type="number" class="form-control" id="monthlyIncome" name="monthlyIncome" step="0.01" min="0.01" placeholder="Ej. 50000" required>
               <div class="invalid-feedback">El ingreso mensual debe ser mayor que cero.</div>
             </div>
             <div class="col-12">
               <label for="applicantAddress" class="form-label">Dirección *</label>
-              <input type="text" class="form-control" id="applicantAddress" name="applicantAddress" required>
+              <input type="text" class="form-control" id="applicantAddress" name="applicantAddress" placeholder="Calle Central #45, Ensanche La Fe" required>
               <div class="invalid-feedback">Debe ingresar la dirección del solicitante.</div>
             </div>
           </div>
@@ -98,7 +99,7 @@
       </section>
 
       <!-- 3. Datos generales del préstamo -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionLoanGeneral">
         <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">3. Datos generales del préstamo</h2>
         </div>
@@ -107,7 +108,7 @@
             <div class="col-md-4">
               <label for="loanType" class="form-label">Tipo de préstamo *</label>
               <select class="form-select" id="loanType" name="loanType" required>
-                <option value="Préstamo personal">Préstamo personal</option>
+                <option value="Préstamo personal" selected>Préstamo personal</option>
                 <option value="Préstamo de vehículo">Préstamo de vehículo</option>
                 <option value="Préstamo hipotecario">Préstamo hipotecario</option>
                 <option value="Préstamo comercial">Préstamo comercial</option>
@@ -117,13 +118,13 @@
             </div>
             <div class="col-md-4">
               <label for="quoteNumber" class="form-label">Número de cotización *</label>
-              <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required>
+              <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" placeholder="Ej. COT-2026-001" required>
               <div class="invalid-feedback">Debe ingresar el número de cotización.</div>
             </div>
             <div class="col-md-4">
               <label for="currency" class="form-label">Moneda *</label>
               <select class="form-select" id="currency" name="currency" required>
-                <option value="DOP">DOP</option>
+                <option value="DOP" selected>DOP</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
               </select>
@@ -142,7 +143,7 @@
             <div class="col-md-4">
               <label for="status" class="form-label">Estado *</label>
               <select class="form-select" id="status" name="status" required>
-                <option value="Pendiente">Pendiente</option>
+                <option value="Pendiente" selected>Pendiente</option>
                 <option value="Aprobada">Aprobada</option>
                 <option value="Rechazada">Rechazada</option>
                 <option value="Vencida">Vencida</option>
@@ -154,7 +155,7 @@
       </section>
 
       <!-- 4. Condiciones financieras -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionFinancialConditions">
         <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">4. Condiciones financieras</h2>
         </div>
@@ -162,12 +163,12 @@
           <div class="row g-3">
             <div class="col-md-4">
               <label for="requestedAmount" class="form-label">Monto solicitado *</label>
-              <input type="number" class="form-control" id="requestedAmount" name="requestedAmount" step="0.01" min="0.01" required>
+              <input type="number" class="form-control" id="requestedAmount" name="requestedAmount" step="0.01" min="0.01" placeholder="Ej. 100000" required>
               <div class="invalid-feedback">El monto solicitado debe ser mayor que cero.</div>
             </div>
             <div class="col-md-4">
               <label for="downPayment" class="form-label">Pago inicial</label>
-              <input type="number" class="form-control" id="downPayment" name="downPayment" step="0.01" min="0" value="0">
+              <input type="number" class="form-control" id="downPayment" name="downPayment" step="0.01" min="0" placeholder="0.00" value="0">
               <div class="invalid-feedback">El pago inicial debe ser menor que el monto solicitado.</div>
             </div>
             <div class="col-md-4">
@@ -176,12 +177,12 @@
             </div>
             <div class="col-md-4">
               <label for="annualInterestRate" class="form-label">Tasa de interés anual (%) *</label>
-              <input type="number" class="form-control" id="annualInterestRate" name="annualInterestRate" step="0.01" min="0" max="100" required>
+              <input type="number" class="form-control" id="annualInterestRate" name="annualInterestRate" step="0.01" min="0" max="100" placeholder="Ej. 18" required>
               <div class="invalid-feedback">La tasa de interés anual debe estar entre 0 y 100.</div>
             </div>
             <div class="col-md-4">
               <label for="termMonths" class="form-label">Plazo en meses *</label>
-              <input type="number" class="form-control" id="termMonths" name="termMonths" min="1" max="360" step="1" required>
+              <input type="number" class="form-control" id="termMonths" name="termMonths" min="1" max="360" step="1" placeholder="Ej. 12" required>
               <div class="invalid-feedback">El plazo en meses debe ser un número entero mayor que cero y menor o igual que 360.</div>
             </div>
             <div class="col-md-4">
@@ -202,7 +203,7 @@
       </section>
 
       <!-- 5. Cargos adicionales y seguro -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionAdditionalCharges">
         <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">5. Cargos adicionales y seguro</h2>
         </div>
@@ -216,12 +217,12 @@
             </div>
             <div class="col-md-4">
               <label for="insurancePercentage" class="form-label">Porcentaje de seguro mensual (%)</label>
-              <input type="number" class="form-control" id="insurancePercentage" name="insurancePercentage" step="0.01" min="0" max="100" disabled>
-              <div class="invalid-feedback">Debe ingresar el porcentaje de seguro mensual (entre 0 y 100).</div>
+              <input type="number" class="form-control" id="insurancePercentage" name="insurancePercentage" step="0.01" min="0" max="100" placeholder="Ej. 0.5" disabled>
+              <div class="invalid-feedback">Debe ingresar el porcentaje de seguro mensual.</div>
             </div>
             <div class="col-md-4">
               <label for="adminFee" class="form-label">Comisión administrativa</label>
-              <input type="number" class="form-control" id="adminFee" name="adminFee" step="0.01" min="0" value="0">
+              <input type="number" class="form-control" id="adminFee" name="adminFee" step="0.01" min="0" placeholder="0.00" value="0">
               <div class="invalid-feedback">La comisión administrativa no puede ser menor que cero.</div>
             </div>
             <div class="col-md-6">
@@ -237,21 +238,18 @@
       </section>
 
       <!-- 6. Pagos extraordinarios -->
-      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-header bg-success-subtle text-success-emphasis d-flex justify-content-between align-items-center">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="sectionExtraPayments">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">6. Pagos extraordinarios</h2>
-          <button type="button" class="btn btn-light btn-sm" id="btnAddExtraPayment">
-            + Agregar pago extraordinario
-          </button>
         </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle mb-0" id="extraPaymentsTable">
               <thead class="table-secondary">
                 <tr>
-                  <th style="width: 20%;">Mes de aplicación *</th>
+                  <th style="width: 25%;">Mes de aplicación *</th>
                   <th style="width: 30%;">Monto del pago *</th>
-                  <th style="width: 35%;">Descripción</th>
+                  <th style="width: 30%;">Descripción</th>
                   <th style="width: 15%; text-align: center;">Acción</th>
                 </tr>
               </thead>
@@ -263,11 +261,16 @@
           <div id="noExtraPaymentsMsg" class="text-muted text-center py-3">
             No se han registrado pagos extraordinarios.
           </div>
-          <div class="invalid-feedback d-block" id="extraPaymentGlobalError" style="display: none;"></div>
+          <div class="mt-3">
+            <button type="button" class="btn btn-outline-success btn-sm" id="btnAddExtraPayment">
+              Agregar pago extraordinario
+            </button>
+          </div>
+          <div class="invalid-feedback d-block mt-2" id="extraPaymentGlobalError" style="display: none;"></div>
         </div>
       </section>
 
-      <!-- Botón de acción principal -->
+      <!-- Botón de acción principal al final del formulario -->
       <div class="text-center my-4">
         <button type="button" class="btn btn-success btn-lg px-5 shadow rounded-pill" id="btnGenerateQuote">
           Generar cotización
@@ -435,10 +438,10 @@
     <!-- 9. Cotización generada -->
     <section class="card shadow border-success rounded-4 overflow-hidden mb-5" id="quoteGeneratedSection" style="display: none;">
       <div class="card-header bg-success text-white">
-        <h2 class="h4 mb-0">9. Cotización generada</h2>
+        <h2 class="h4 mb-0">Cotización generada</h2>
       </div>
       <div class="card-body p-4" id="quoteGeneratedContainer">
-        <!-- Contenido renderizado dinámicamente al generar cotización -->
+        <!-- Contenido renderizado dinámicamente al generar cotización con todas sus subsecciones -->
       </div>
     </section>
   </div>
