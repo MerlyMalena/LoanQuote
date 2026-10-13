@@ -1,20 +1,25 @@
-// Se ejecuta solo cuando el HTML carga completamente
-$(document).ready(function(){  
-$("#requestedAmount, #downPayment").on('input',()=>{
-const requestedAmount=parseFloat(document.getElementById("requestedAmount").value);
-const downPayment=parseFloat(document.querySelector("#downPayment").value);
 
-while (requestedAmount<downPayment)
-{
-    alert('El monto solicitado debe ser mayor al pago inicial');
-    document.getElementById("downPayment").val(0);
-    document.getElementById("downPayment").focus();
+function calculateFinancedAmount(){
+    const requestedAmount=parseFloat(document.getElementById("requestedAmount").value);
+        const downPayment=parseFloat(document.querySelector("#downPayment").value);
+    let amountFinanced= requestedAmount-downPayment;
+    return amountFinanced;
 }
 
-let amountFinanced= requestedAmount-downPayment;
+function calculateBaseAmountWithFee(){
+  const adminFee= parseFloat(document.querySelector("#adminFee").value);
+    let baseAmount=calculateFinancedAmount()+adminFee;
+    return baseAmount;
+}
 
+function calculateFinalFinancedAmount(selectedOption){
+   let montoFinanciado=1;
+    if (selectedOption=="Cobrar como cargo inicial"){
+        montoFinanciado=calculateFinancedAmount();
+    }
+    else {
+        montoFinanciado=calculateBaseAmountWithFee();
+    }
+    return montoFinanciado;
+}
 
-// Le da al input el nuevo valor
-$('#financedAmountDisplay').val(amountFinanced);
-});
-});
