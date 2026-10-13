@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoanQuote - Cotizador de Préstamos</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-light">
+
+  <div class="container my-5">
+    <header class="text-center mb-5">
+      <h1 class="fw-bold">LoanQuote</h1>
+      <p class="text-muted">Generador de cotizaciones de préstamos y planes de pago</p>
+    </header>
+
+    <form id="loanForm" novalidate>
+      <!-- 1. Datos de la entidad financiera -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">1. Datos de la entidad financiera</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="entityName" class="form-label">Nombre de la entidad *</label>
+              <input type="text" class="form-control" id="entityName" name="entityName" required>
+              <div class="invalid-feedback">Debe ingresar el nombre de la entidad financiera.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="entityRnc" class="form-label">RNC o identificación *</label>
+              <input type="text" class="form-control" id="entityRnc" name="entityRnc" required>
+              <div class="invalid-feedback">Debe ingresar el RNC o identificación.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="entityPhone" class="form-label">Teléfono *</label>
+              <input type="text" class="form-control" id="entityPhone" name="entityPhone" required>
+              <div class="invalid-feedback">Debe ingresar el teléfono de la entidad.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="entityEmail" class="form-label">Correo electrónico *</label>
+              <input type="email" class="form-control" id="entityEmail" name="entityEmail" required>
+              <div class="invalid-feedback">Debe ingresar un correo electrónico válido.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="entityLogo" class="form-label">URL del logo</label>
+              <input type="url" class="form-control" id="entityLogo" name="entityLogo">
+              <div class="invalid-feedback">Debe ingresar una URL de logo válida.</div>
+            </div>
+            <div class="col-12">
+              <label for="entityAddress" class="form-label">Dirección *</label>
+              <input type="text" class="form-control" id="entityAddress" name="entityAddress" required>
+              <div class="invalid-feedback">Debe ingresar la dirección de la entidad.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Datos del solicitante -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">2. Datos del solicitante</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="applicantName" class="form-label">Nombre del solicitante *</label>
+              <input type="text" class="form-control" id="applicantName" name="applicantName" required>
+              <div class="invalid-feedback">Debe ingresar el nombre del solicitante.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="applicantId" class="form-label">Identificación *</label>
+              <input type="text" class="form-control" id="applicantId" name="applicantId" required>
+              <div class="invalid-feedback">Debe ingresar la identificación del solicitante.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="applicantPhone" class="form-label">Teléfono *</label>
+              <input type="text" class="form-control" id="applicantPhone" name="applicantPhone" required>
+              <div class="invalid-feedback">Debe ingresar el teléfono del solicitante.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="applicantEmail" class="form-label">Correo electrónico *</label>
+              <input type="email" class="form-control" id="applicantEmail" name="applicantEmail" required>
+              <div class="invalid-feedback">Debe ingresar un correo electrónico válido.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="monthlyIncome" class="form-label">Ingreso mensual *</label>
+              <input type="number" class="form-control" id="monthlyIncome" name="monthlyIncome" step="0.01" min="0.01" required>
+              <div class="invalid-feedback">El ingreso mensual debe ser mayor que cero.</div>
+            </div>
+            <div class="col-12">
+              <label for="applicantAddress" class="form-label">Dirección *</label>
+              <input type="text" class="form-control" id="applicantAddress" name="applicantAddress" required>
+              <div class="invalid-feedback">Debe ingresar la dirección del solicitante.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Datos generales del préstamo -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">3. Datos generales del préstamo</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="loanType" class="form-label">Tipo de préstamo *</label>
+              <select class="form-select" id="loanType" name="loanType" required>
+                <option value="Préstamo personal">Préstamo personal</option>
+                <option value="Préstamo de vehículo">Préstamo de vehículo</option>
+                <option value="Préstamo hipotecario">Préstamo hipotecario</option>
+                <option value="Préstamo comercial">Préstamo comercial</option>
+                <option value="Préstamo educativo">Préstamo educativo</option>
+              </select>
+              <div class="invalid-feedback">Debe seleccionar un tipo de préstamo.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="quoteNumber" class="form-label">Número de cotización *</label>
+              <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required>
+              <div class="invalid-feedback">Debe ingresar el número de cotización.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="currency" class="form-label">Moneda *</label>
+              <select class="form-select" id="currency" name="currency" required>
+                <option value="DOP">DOP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+              <div class="invalid-feedback">Debe seleccionar una moneda.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="quoteDate" class="form-label">Fecha de cotización *</label>
+              <input type="date" class="form-control" id="quoteDate" name="quoteDate" required>
+              <div class="invalid-feedback">Debe ingresar la fecha de cotización.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="expiryDate" class="form-label">Fecha de vencimiento *</label>
+              <input type="date" class="form-control" id="expiryDate" name="expiryDate" required>
+              <div class="invalid-feedback">La fecha de vencimiento debe ser igual o mayor que la fecha de cotización.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="status" class="form-label">Estado *</label>
+              <select class="form-select" id="status" name="status" required>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Aprobada">Aprobada</option>
+                <option value="Rechazada">Rechazada</option>
+                <option value="Vencida">Vencida</option>
+              </select>
+              <div class="invalid-feedback">Debe seleccionar un estado.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Condiciones financieras -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">4. Condiciones financieras</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="requestedAmount" class="form-label">Monto solicitado *</label>
+              <input type="number" class="form-control" id="requestedAmount" name="requestedAmount" step="0.01" min="0.01" required>
+              <div class="invalid-feedback">El monto solicitado debe ser mayor que cero.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="downPayment" class="form-label">Pago inicial</label>
+              <input type="number" class="form-control" id="downPayment" name="downPayment" step="0.01" min="0" value="0">
+              <div class="invalid-feedback">El pago inicial debe ser menor que el monto solicitado.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="financedAmountDisplay" class="form-label">Monto financiado (Calculado)</label>
+              <input type="text" class="form-control bg-light" id="financedAmountDisplay" readonly value="0.00">
+            </div>
+            <div class="col-md-4">
+              <label for="annualInterestRate" class="form-label">Tasa de interés anual (%) *</label>
+              <input type="number" class="form-control" id="annualInterestRate" name="annualInterestRate" step="0.01" min="0" max="100" required>
+              <div class="invalid-feedback">La tasa de interés anual debe estar entre 0 y 100.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="termMonths" class="form-label">Plazo en meses *</label>
+              <input type="number" class="form-control" id="termMonths" name="termMonths" min="1" max="360" step="1" required>
+              <div class="invalid-feedback">El plazo en meses debe ser un número entero mayor que cero y menor o igual que 360.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="firstPaymentDate" class="form-label">Fecha del primer pago *</label>
+              <input type="date" class="form-control" id="firstPaymentDate" name="firstPaymentDate" required>
+              <div class="invalid-feedback">La fecha del primer pago debe ser igual o mayor que la fecha de cotización.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="amortizationType" class="form-label">Tipo de amortización *</label>
+              <select class="form-select" id="amortizationType" name="amortizationType" required>
+                <option value="Cuota fija" selected>Cuota fija</option>
+                <option value="Capital fijo">Capital fijo</option>
+              </select>
+              <div class="invalid-feedback">Debe seleccionar un tipo de amortización.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Cargos adicionales y seguro -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">5. Cargos adicionales y seguro</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <div class="form-check pt-3">
+                <input class="form-check-input" type="checkbox" id="applyInsurance" name="applyInsurance">
+                <label class="form-check-label" for="applyInsurance">Aplicar seguro mensual</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="insurancePercentage" class="form-label">Porcentaje de seguro mensual (%)</label>
+              <input type="number" class="form-control" id="insurancePercentage" name="insurancePercentage" step="0.01" min="0" max="100" disabled>
+              <div class="invalid-feedback">Debe ingresar el porcentaje de seguro mensual (entre 0 y 100).</div>
+            </div>
+            <div class="col-md-4">
+              <label for="adminFee" class="form-label">Comisión administrativa</label>
+              <input type="number" class="form-control" id="adminFee" name="adminFee" step="0.01" min="0" value="0">
+              <div class="invalid-feedback">La comisión administrativa no puede ser menor que cero.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="adminFeeType" class="form-label">Forma de aplicar comisión *</label>
+              <select class="form-select" id="adminFeeType" name="adminFeeType" required>
+                <option value="Cobrar como cargo inicial" selected>Cobrar como cargo inicial</option>
+                <option value="Sumar al monto financiado">Sumar al monto financiado</option>
+              </select>
+              <div class="invalid-feedback">Debe indicar la forma de aplicar la comisión.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Pagos extraordinarios -->
+      <section class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">6. Pagos extraordinarios</h2>
+          <button type="button" class="btn btn-light btn-sm" id="btnAddExtraPayment">
+            + Agregar pago extraordinario
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0" id="extraPaymentsTable">
+              <thead class="table-secondary">
+                <tr>
+                  <th style="width: 20%;">Mes de aplicación *</th>
+                  <th style="width: 30%;">Monto del pago *</th>
+                  <th style="width: 35%;">Descripción</th>
+                  <th style="width: 15%; text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="extraPaymentsContainer">
+                <!-- Se agregan dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+          <div id="noExtraPaymentsMsg" class="text-muted text-center py-3">
+            No se han registrado pagos extraordinarios.
+          </div>
+          <div class="invalid-feedback d-block" id="extraPaymentGlobalError" style="display: none;"></div>
+        </div>
+      </section>
+
+      <!-- Botón de acción principal -->
+      <div class="text-center my-4">
+        <button type="button" class="btn btn-success btn-lg px-5 shadow" id="btnGenerateQuote">
+          Generar cotización
+        </button>
+      </div>
+    </form>
+
+    <!-- 7. Resumen de cálculos -->
+    <section class="card shadow-sm mb-4" id="summarySection">
+      <div class="card-header bg-dark text-white">
+        <h2 class="h5 mb-0">7. Resumen de cálculos</h2>
+      </div>
+      <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Monto solicitado</span>
+              <strong class="fs-6" id="resMontoSolicitado">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Pago inicial</span>
+              <strong class="fs-6" id="resPagoInicial">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Comisión administrativa</span>
+              <strong class="fs-6" id="resComision">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Monto financiado</span>
+              <strong class="fs-6" id="resMontoFinanciado">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Monto base del préstamo</span>
+              <strong class="fs-6" id="resMontoBase">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Tasa de interés anual</span>
+              <strong class="fs-6" id="resTasaAnual">0.00%</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Tasa de interés mensual</span>
+              <strong class="fs-6" id="resTasaMensual">0.00%</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Plazo en meses</span>
+              <strong class="fs-6" id="resPlazoMeses">0</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Cantidad de cuotas generadas</span>
+              <strong class="fs-6" id="resCuotasGeneradas">0</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Cuota estimada inicial</span>
+              <strong class="fs-6" id="resCuotaInicial">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total capital pagado</span>
+              <strong class="fs-6" id="resTotalCapital">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total intereses</span>
+              <strong class="fs-6" id="resTotalIntereses">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total seguro</span>
+              <strong class="fs-6" id="resTotalSeguro">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total pagos extraordinarios aplicados</span>
+              <strong class="fs-6" id="resTotalPagosExtra">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total cuotas pagadas</span>
+              <strong class="fs-6" id="resTotalCuotas">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Total general a pagar</span>
+              <strong class="fs-6 text-primary" id="resTotalGeneral">0.00</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Fecha estimada de finalización</span>
+              <strong class="fs-6" id="resFechaFin">-</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Relación cuota / ingreso</span>
+              <strong class="fs-6" id="resRelacionCuotaIngreso">0.00%</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded bg-white">
+              <span class="text-muted d-block small">Nivel de endeudamiento</span>
+              <span class="badge bg-secondary fs-6" id="resNivelEndeudamiento">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Tabla de amortización -->
+    <section class="card shadow-sm mb-5" id="amortizationSection">
+      <div class="card-header bg-dark text-white">
+        <h2 class="h5 mb-0">8. Tabla de amortización</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover table-bordered align-middle text-end mb-0" id="amortizationTable">
+            <thead class="table-secondary text-center">
+              <tr>
+                <th>#</th>
+                <th>Fecha de pago</th>
+                <th>Balance inicial</th>
+                <th>Cuota base</th>
+                <th>Capital</th>
+                <th>Interés</th>
+                <th>Seguro</th>
+                <th>Pago extraordinario</th>
+                <th>Cuota total</th>
+                <th>Balance final</th>
+              </tr>
+            </thead>
+            <tbody id="amortizationContainer">
+              <tr>
+                <td colspan="10" class="text-center py-4 text-muted">Complete los datos obligatorios para ver la tabla de amortización.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Cotización generada -->
+    <section class="card shadow border-success mb-5" id="quoteGeneratedSection" style="display: none;">
+      <div class="card-header bg-success text-white">
+        <h2 class="h4 mb-0">9. Cotización generada</h2>
+      </div>
+      <div class="card-body p-4" id="quoteGeneratedContainer">
+        <!-- Contenido renderizado dinámicamente al generar cotización -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts en orden estricto de dependencias -->
+  <script src="js/vendor/jquery.min.js"></script>
+  <script src="js/utils/formatters.js"></script>
+  <script src="js/utils/validators.js"></script>
+  <script src="js/loanCalculator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
