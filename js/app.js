@@ -85,30 +85,23 @@ $("#btnGenerateQuote").on('click', function(){
    });
 
    const currency = selectCurrency();
-   $("#resMontoSolicitado").text(formatCurrency(requestedAmount, currency));
-   $("#resPagoInicial").text(formatCurrency(downPayment, currency));
-   $("#resMontoBase").text(formatCurrency(calculateBaseAmountWithFee(), currency)); //Es un strong
-   $("#resComision").text(formatCurrency(adminFee, currency));
-   $("#resTasaAnual").text(anualRate.toFixed(2)+"%");
-   $("#resTasaMensual").text((calculateMonthlyRate(anualRate)*100).toFixed(2)+"%");
-   $("#resPlazoMeses").text(monthsDeadline);
-   $("#resCuotaInicial").text(formatCurrency(calculateFixedInstallment(
-      anualRate,
-      monthsDeadline,
-      monthlyInsurancePerc
-   ), currency));
-   actualizarMonto();
+   const amortizationType = document.querySelector("#amortizationType").value;
+   const firstPaymentDate = document.querySelector("#firstPaymentDate").value;
+   const monthlyIncome = parseFloat(document.querySelector("#monthlyIncome").value) || 0;
 
-   const payments=calculateAmortization(
+   // Calcula la tabla de amortización
+   const payments = calculateAmortization(
       baseAmount,
       anualRate,
       monthsDeadline,
       monthlyInsurancePerc,
-      document.querySelector("#amortizationType").value,
+      amortizationType,
       extraPayments,
-      document.querySelector("#firstPaymentDate").value
+      firstPaymentDate
    );
-   $("#amortizationContainer").html(payments.map(payment=>`<tr>
+
+   // Renderiza la tabla de amortización
+   $("#amortizationContainer").html(payments.map(payment => `<tr>
       <td>${payment.month}</td>
       <td>${payment.date}</td>
       <td>${formatCurrency(payment.initialBalance, currency)}</td>
@@ -120,5 +113,61 @@ $("#btnGenerateQuote").on('click', function(){
       <td>${formatCurrency(payment.totalPayment, currency)}</td>
       <td>${formatCurrency(payment.finalBalance, currency)}</td>
    </tr>`).join(''));
+
+   // Totales acumulados para el resumen
+   const cuotasGeneradas = payments.length;
+   const totalCapital = payments.reduce((sum, p) => sum + p.capital, 0);
+   const totalIntereses = payments.reduce((sum, p) => sum + p.interest, 0);
+   const totalSeguro = payments.reduce((sum, p) => sum + p.insurance, 0);
+   const totalPagosExtra = payments.reduce((sum, p) => sum + p.extraPayment, 0);
+   const totalCuotasPagadas = payments.reduce((sum, p) => sum + (p.installment + p.insurance), 0);
+   const cuotaInicialTotal = payments.length > 0 ? (payments[0].installment + payments[0].insurance) : 0;
+
+   // Si la comisión se cobró como cargo inicial, se suma al total general a pagar
+   const comisionInicial = selectedOption === "Cobrar como cargo inicial" ? adminFee : 0;
+   const totalGeneral = totalCuotasPagadas + comisionInicial;
+
+   // Fecha de la última cuota generada
+   const fechaFin = payments.length > 0 ? payments[payments.length - 1].date : "-";
+
+   // Relación cuota / ingreso y nivel de endeudamiento
+   let relacionCuotaIngreso = 0;
+   let nivelEndeudamiento = "-";
+   let badgeClass = "bg-secondary";
+
+   if (monthlyIncome > 0 && cuotaInicialTotal > 0) {
+      relacionCuotaIngreso = (cuotaInicialTotal / monthlyIncome) * 100;
+      if (relacionCuotaIngreso <= 30) {
+         nivelEndeudamiento = "Nivel saludable";
+         badgeClass = "bg-success";
+      } else if (relacionCuotaIngreso <= 50) {
+         nivelEndeudamiento = "Nivel de riesgo medio";
+         badgeClass = "bg-warning text-dark";
+      } else {
+         nivelEndeudamiento = "Nivel de riesgo alto";
+         badgeClass = "bg-danger";
+      }
+   }
+
+   // Actualiza todos los campos del resumen de cálculos
+   $("#resMontoSolicitado").text(formatCurrency(requestedAmount, currency));
+   $("#resPagoInicial").text(formatCurrency(downPayment, currency));
+   $("#resComision").text(formatCurrency(adminFee, currency));
+   $("#resMontoBase").text(formatCurrency(baseAmount, currency));
+   $("#resTasaAnual").text(anualRate.toFixed(2) + "%");
+   $("#resTasaMensual").text((calculateMonthlyRate(anualRate) * 100).toFixed(2) + "%");
+   $("#resPlazoMeses").text(monthsDeadline);
+   $("#resCuotasGeneradas").text(cuotasGeneradas);
+   $("#resCuotaInicial").text(formatCurrency(cuotaInicialTotal, currency));
+   $("#resTotalCapital").text(formatCurrency(totalCapital, currency));
+   $("#resTotalIntereses").text(formatCurrency(totalIntereses, currency));
+   $("#resTotalSeguro").text(formatCurrency(totalSeguro, currency));
+   $("#resTotalPagosExtra").text(formatCurrency(totalPagosExtra, currency));
+   $("#resTotalCuotas").text(formatCurrency(totalCuotasPagadas, currency));
+   $("#resTotalGeneral").text(formatCurrency(totalGeneral, currency));
+   $("#resFechaFin").text(fechaFin);
+   $("#resRelacionCuotaIngreso").text(relacionCuotaIngreso.toFixed(2) + "%");
+   $("#resNivelEndeudamiento").text(nivelEndeudamiento).removeClass("bg-secondary bg-success bg-warning bg-danger text-dark").addClass(badgeClass);
+   actualizarMonto();
 });
 });
