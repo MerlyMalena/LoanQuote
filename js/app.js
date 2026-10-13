@@ -1,6 +1,14 @@
 // Se ejecuta solo cuando el HTML carga completamente
 $(document).ready(function(){  
 
+// Datos generales
+// Seleccionar moneda 
+function selectCurrency() {
+  let selectedOption = $("#currency").val();
+   return selectedOption;
+}
+
+
 // Condiciones financieras
 $("#requestedAmount, #downPayment").on('input',()=>{
 const requestedAmount=parseFloat(document.getElementById("requestedAmount").value);
@@ -38,7 +46,7 @@ $("#applyInsurance").on('change', function(){
 function actualizarMonto() {
   let selectedOption = $("#adminFeeType").val();
   const financedAmount = calculateFinalFinancedAmount(selectedOption);
-  $("#resMontoFinanciado").text(financedAmount.toFixed(2));
+  $("#resMontoFinanciado").text(formatCurrency(financedAmount, selectCurrency()));
 }
 
 $("#btnAddExtraPayment").on('click', function(){
@@ -80,18 +88,19 @@ $("#btnGenerateQuote").on('click', function(){
       }
    });
 
-   $("#resMontoSolicitado").text(requestedAmount.toFixed(2));
-   $("#resPagoInicial").text(downPayment.toFixed(2));
-   $("#resMontoBase").text(calculateBaseAmountWithFee().toFixed(2)); //Es un strong
-   $("#resComision").text(adminFee.toFixed(2));
+   const currency = selectCurrency();
+   $("#resMontoSolicitado").text(formatCurrency(requestedAmount, currency));
+   $("#resPagoInicial").text(formatCurrency(downPayment, currency));
+   $("#resMontoBase").text(formatCurrency(calculateBaseAmountWithFee(), currency)); //Es un strong
+   $("#resComision").text(formatCurrency(adminFee, currency));
    $("#resTasaAnual").text(anualRate.toFixed(2)+"%");
    $("#resTasaMensual").text((calculateMonthlyRate(anualRate)*100).toFixed(2)+"%");
    $("#resPlazoMeses").text(monthsDeadline);
-   $("#resCuotaInicial").text(calculateFixedInstallment(
+   $("#resCuotaInicial").text(formatCurrency(calculateFixedInstallment(
       anualRate,
       monthsDeadline,
       monthlyInsurancePerc
-   ).toFixed(2));
+   ), currency));
    actualizarMonto();
 
    const payments=calculateAmortization(
@@ -103,18 +112,17 @@ $("#btnGenerateQuote").on('click', function(){
       extraPayments,
       document.querySelector("#firstPaymentDate").value
    );
-   const money=value=>value.toFixed(2);
    $("#amortizationContainer").html(payments.map(payment=>`<tr>
       <td>${payment.month}</td>
       <td>${payment.date}</td>
-      <td>${money(payment.initialBalance)}</td>
-      <td>${money(payment.installment)}</td>
-      <td>${money(payment.capital)}</td>
-      <td>${money(payment.interest)}</td>
-      <td>${money(payment.insurance)}</td>
-      <td>${money(payment.extraPayment)}</td>
-      <td>${money(payment.totalPayment)}</td>
-      <td>${money(payment.finalBalance)}</td>
+      <td>${formatCurrency(payment.initialBalance, currency)}</td>
+      <td>${formatCurrency(payment.installment, currency)}</td>
+      <td>${formatCurrency(payment.capital, currency)}</td>
+      <td>${formatCurrency(payment.interest, currency)}</td>
+      <td>${formatCurrency(payment.insurance, currency)}</td>
+      <td>${formatCurrency(payment.extraPayment, currency)}</td>
+      <td>${formatCurrency(payment.totalPayment, currency)}</td>
+      <td>${formatCurrency(payment.finalBalance, currency)}</td>
    </tr>`).join(''));
 });
 });
