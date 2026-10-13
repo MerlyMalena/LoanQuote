@@ -11,18 +11,17 @@ function selectCurrency() {
 
 // Condiciones financieras
 $("#requestedAmount, #downPayment").on('input',()=>{
-const requestedAmount=parseFloat(document.getElementById("requestedAmount").value);
-const downPayment=parseFloat(document.querySelector("#downPayment").value);
+  const requestedAmount = parseFloat(document.getElementById("requestedAmount").value) || 0;
+  const downPayment = parseFloat(document.querySelector("#downPayment").value) || 0;
 
-if (requestedAmount<downPayment)
-{
-    alert('El monto solicitado debe ser mayor al pago inicial');
-    document.getElementById("downPayment").value=0;
-    document.getElementById("downPayment").focus();
-}
+  if (downPayment >= requestedAmount && requestedAmount > 0) {
+    setFieldError('#downPayment', 'El pago inicial debe ser menor que el monto solicitado.');
+  } else {
+    clearFieldError('#downPayment');
+  }
 
-// Le da al input el nuevo valor
-$('#financedAmountDisplay').val(calculateFinancedAmount());
+  // Le da al input el nuevo valor
+  $('#financedAmountDisplay').val(calculateFinancedAmount().toFixed(2));
 });
 
 
@@ -61,6 +60,11 @@ $("#btnAddExtraPayment").on('click', function(){
 
 // Generar resumen de cotización
 $("#btnGenerateQuote").on('click', function(){
+   // Valida todos los campos antes de continuar
+   if (!validateAll()) {
+      return;
+   }
+
    const requestedAmount=parseFloat(document.querySelector("#requestedAmount").value)||0;
    const downPayment=parseFloat(document.querySelector("#downPayment").value)||0;
    const adminFee=parseFloat(document.querySelector("#adminFee").value)||0;
@@ -71,14 +75,6 @@ $("#btnGenerateQuote").on('click', function(){
    const selectedOption=$("#adminFeeType").val();
    const baseAmount=calculateFinalFinancedAmount(selectedOption);
    const extraPayments={};
-
-   if (baseAmount<=0){
-      alert("Ingresa un monto solicitado mayor que cero para generar la tabla.");
-      return;
-   }
-   if (document.querySelector("#quoteDate").value&&document.querySelector("#expiryDate").value&&!validateQuoteDates()){
-      return;
-   }
 
    $("input[name='extraPaymentMonth']").each(function(index){
       const month=parseInt(this.value);
