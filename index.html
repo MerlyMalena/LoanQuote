@@ -5,20 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LoanQuote - Cotizador de Préstamos</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-light">
+<body class="bg-success-subtle">
 
   <div class="container my-5">
     <header class="text-center mb-5">
-      <h1 class="fw-bold">LoanQuote</h1>
+      <h1 class="fw-bold text-success-emphasis">LoanQuote</h1>
       <p class="text-muted">Generador de cotizaciones de préstamos y planes de pago</p>
     </header>
 
     <form id="loanForm" novalidate>
       <!-- 1. Datos de la entidad financiera -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">1. Datos de la entidad financiera</h2>
         </div>
         <div class="card-body">
@@ -58,8 +57,8 @@
       </section>
 
       <!-- 2. Datos del solicitante -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">2. Datos del solicitante</h2>
         </div>
         <div class="card-body">
@@ -99,8 +98,8 @@
       </section>
 
       <!-- 3. Datos generales del préstamo -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">3. Datos generales del préstamo</h2>
         </div>
         <div class="card-body">
@@ -155,8 +154,8 @@
       </section>
 
       <!-- 4. Condiciones financieras -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">4. Condiciones financieras</h2>
         </div>
         <div class="card-body">
@@ -203,8 +202,8 @@
       </section>
 
       <!-- 5. Cargos adicionales y seguro -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis">
           <h2 class="h5 mb-0">5. Cargos adicionales y seguro</h2>
         </div>
         <div class="card-body">
@@ -238,8 +237,8 @@
       </section>
 
       <!-- 6. Pagos extraordinarios -->
-      <section class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <section class="card shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-success-subtle text-success-emphasis d-flex justify-content-between align-items-center">
           <h2 class="h5 mb-0">6. Pagos extraordinarios</h2>
           <button type="button" class="btn btn-light btn-sm" id="btnAddExtraPayment">
             + Agregar pago extraordinario
@@ -270,15 +269,15 @@
 
       <!-- Botón de acción principal -->
       <div class="text-center my-4">
-        <button type="button" class="btn btn-success btn-lg px-5 shadow" id="btnGenerateQuote">
+        <button type="button" class="btn btn-success btn-lg px-5 shadow rounded-pill" id="btnGenerateQuote">
           Generar cotización
         </button>
       </div>
     </form>
 
     <!-- 7. Resumen de cálculos -->
-    <section class="card shadow-sm mb-4" id="summarySection">
-      <div class="card-header bg-dark text-white">
+    <section class="card shadow-sm rounded-4 overflow-hidden mb-4" id="summarySection">
+      <div class="card-header bg-success text-white">
         <h2 class="h5 mb-0">7. Resumen de cálculos</h2>
       </div>
       <div class="card-body">
@@ -376,7 +375,7 @@
           <div class="col">
             <div class="p-3 border rounded bg-white">
               <span class="text-muted d-block small">Total general a pagar</span>
-              <strong class="fs-6 text-primary" id="resTotalGeneral">0.00</strong>
+              <strong class="fs-6 text-success" id="resTotalGeneral">0.00</strong>
             </div>
           </div>
           <div class="col">
@@ -402,8 +401,8 @@
     </section>
 
     <!-- 8. Tabla de amortización -->
-    <section class="card shadow-sm mb-5" id="amortizationSection">
-      <div class="card-header bg-dark text-white">
+    <section class="card shadow-sm rounded-4 overflow-hidden mb-5" id="amortizationSection">
+      <div class="card-header bg-success text-white">
         <h2 class="h5 mb-0">8. Tabla de amortización</h2>
       </div>
       <div class="card-body">
@@ -434,7 +433,7 @@
     </section>
 
     <!-- 9. Cotización generada -->
-    <section class="card shadow border-success mb-5" id="quoteGeneratedSection" style="display: none;">
+    <section class="card shadow border-success rounded-4 overflow-hidden mb-5" id="quoteGeneratedSection" style="display: none;">
       <div class="card-header bg-success text-white">
         <h2 class="h4 mb-0">9. Cotización generada</h2>
       </div>
