@@ -226,7 +226,61 @@ $("#btnGenerateQuote").on('click', function(){
       payments: payments,
       currency: currency
    });
+
+   // Reinicia el formulario dejando la cotización visible
+   resetFormAfterQuote();
 });
+
+// Reinicia el formulario después de generar la cotización
+function resetFormAfterQuote() {
+   // Limpia campos de texto y numéricos del formulario
+   $("#loanForm")[0].reset();
+
+   // Campo calculado debe mostrarse en cero con dos decimales
+   $("#financedAmountDisplay").val("0.00");
+
+   // Selects vuelven a su primera opción por defecto
+   $("#loanType").prop('selectedIndex', 0);
+   $("#currency").prop('selectedIndex', 0);
+   $("#status").prop('selectedIndex', 0);
+   $("#amortizationType").val("Cuota fija");
+   $("#adminFeeType").val("Cobrar como cargo inicial");
+
+   // Checkbox y seguro
+   $("#applyInsurance").prop('checked', false);
+   $("#insurancePercentage").val('').prop('disabled', true).prop('required', false);
+
+   // Vacía listado de pagos extraordinarios
+   $("#extraPaymentsContainer").empty();
+   $("#noExtraPaymentsMsg").show();
+
+   // Resumen de cálculos vuelve a cero
+   $("#resMontoSolicitado").text("0.00");
+   $("#resPagoInicial").text("0.00");
+   $("#resComision").text("0.00");
+   $("#resMontoFinanciado").text("0.00");
+   $("#resMontoBase").text("0.00");
+   $("#resTasaAnual").text("0.00%");
+   $("#resTasaMensual").text("0.00%");
+   $("#resPlazoMeses").text("0");
+   $("#resCuotasGeneradas").text("0");
+   $("#resCuotaInicial").text("0.00");
+   $("#resTotalCapital").text("0.00");
+   $("#resTotalIntereses").text("0.00");
+   $("#resTotalSeguro").text("0.00");
+   $("#resTotalPagosExtra").text("0.00");
+   $("#resTotalCuotas").text("0.00");
+   $("#resTotalGeneral").text("0.00");
+   $("#resFechaFin").text("-");
+   $("#resRelacionCuotaIngreso").text("0.00%");
+   $("#resNivelEndeudamiento").text("-").removeClass("bg-success bg-warning bg-danger text-dark").addClass("bg-secondary");
+
+   // La tabla de amortización del formulario queda vacía
+   $("#amortizationContainer").html('<tr><td colspan="10" class="text-center py-4 text-muted">Complete los datos obligatorios para ver la tabla de amortización.</td></tr>');
+
+   // Los mensajes de error desaparecen
+   clearAllErrors();
+}
 
 // Construye la vista de la cotización generada en el contenedor final
 function renderGeneratedQuote(data) {
